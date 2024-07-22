@@ -1,0 +1,5 @@
+spring.application.name:
+  backend
+jackson:
+  serialization:
+    fail-on-empty-beans: false
