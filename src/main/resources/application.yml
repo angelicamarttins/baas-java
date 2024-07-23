@@ -1,5 +1,8 @@
 spring.application.name:
   backend
-jackson:
-  serialization:
-    fail-on-empty-beans: false
+jpa:
+  database-platform: org.hibernate.dialect.PostgreSQLDialect
+datasource:
+  url: ${SERVICE_TEMPLATE_DBPOSTGRESS_HOST:jdbc:postgresql://localhost:5432/local}
+  username: ${SERVICE_TEMPLATE_DBPOSTGRESS_USERNAME:postgres}
+  password: ${SERVICE_TEMPLATE_DBPOSTGRESS_PASSWORD:postgres}
