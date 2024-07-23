@@ -4,7 +4,6 @@ import com.baas.backend.httpclient.utils.HttpClientUtils;
 import com.baas.backend.model.Customer;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import org.springframework.stereotype.Service;
 
