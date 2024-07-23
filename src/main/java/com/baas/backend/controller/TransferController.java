@@ -1,7 +1,6 @@
 package com.baas.backend.controller;
 
-import com.baas.backend.data.dto.TransferRequestDto;
-import com.baas.backend.data.dto.TransferResponseDto;
+import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.service.TransferService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,24 +10,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
+@RestController
 @AllArgsConstructor
 @RequestMapping("/transfer")
-@RestController
-@Slf4j
 public class TransferController {
 
   private final TransferService transferService;
 
   @PostMapping
-  public ResponseEntity<TransferResponseDto> transfer(@RequestBody TransferRequestDto transferRequest) {
+  public ResponseEntity<TransferDto.Response> transfer(@RequestBody TransferDto.Request transferRequest) {
     log.info(
       "Starting transfer amount between accounts. ClientId: {}, SourceAccountId: {}, TargetAccountId: {}",
-      transferRequest.clientId(),
+      transferRequest.customerId(),
       transferRequest.accounts().sourceAccountId(),
       transferRequest.accounts().targetAccountId()
     );
 
-    return ResponseEntity.ok(transferService.saveTransfer(transferRequest));
+    return ResponseEntity.ok(transferService.processTransfer(transferRequest));
   }
 
 }

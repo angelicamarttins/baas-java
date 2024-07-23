@@ -18,4 +18,5 @@ spring:
   jackson:
     serialization:
       fail-on-empty-beans: false
-
+external-services:
+    url: http://localhost:9090

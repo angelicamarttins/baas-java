@@ -1,54 +1,47 @@
 package com.baas.backend.service;
 
-import com.baas.backend.data.dto.TransferRequestDto;
-import com.baas.backend.data.dto.TransferResponseDto;
+import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.model.AccountType;
+import com.baas.backend.model.Customer;
 import com.baas.backend.model.Transfer;
-import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.strategy.contract.StrategyValidator;
 import com.baas.backend.service.strategy.contract.TransferStrategy;
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class TransferService {
 
-  private final TransferRepository transferRepository;
+  private final TransferValidator transferValidator;
   private final Map<AccountType, TransferStrategy> strategies;
 
-  public TransferService(
-    TransferRepository transferRepository,
-    StrategyValidator strategyValidator
-  ) {
-    this.transferRepository = transferRepository;
+  public TransferService(TransferValidator transferValidator, StrategyValidator strategyValidator) {
+    this.transferValidator = transferValidator;
     this.strategies = strategyValidator.getStrategies();
   }
 
-  public TransferResponseDto saveTransfer(TransferRequestDto transferRequest) {
-    TransferStrategy transferStrategy = strategies.get(AccountType.NATURAL_PERSON);
+  public TransferDto.Response processTransfer(TransferDto.Request transferRequest) {
+    Customer customer = transferValidator.verifyCustomerRegister(transferRequest.customerId());
 
-    transferStrategy.verifyClientRegistry(transferRequest.clientId());
+    TransferStrategy transferStrategy = strategies.get(customer.accountType());
+
+    if (Objects.isNull(transferStrategy)) {
+      log.info("Strategy with type {} is unavailable.", customer.accountType());
+      throw new IllegalStateException("Strategy not found for " + customer.accountType().name());
+    }
+
     transferStrategy.verifyAccounts(
       transferRequest.accounts().sourceAccountId(),
       transferRequest.accounts().targetAccountId()
     );
-    Transfer transfer = new Transfer(
-      UUID.randomUUID(),
-      transferRequest.clientId(),
-      transferRequest.accounts().sourceAccountId(),
-      UUID.randomUUID(),
-      transferRequest.accounts().targetAccountId(),
-      transferRequest.value(),
-      LocalDateTime.now(),
-      null
-    );
+
+    Transfer transfer = transferStrategy.saveTransfer(transferRequest);
     transferStrategy.notifyBacen(transfer);
 
-    transferRepository.save(transfer);
-
-    return new TransferResponseDto(UUID.randomUUID());
+    return new TransferDto.Response(transfer.getTransferId());
   }
 
 }

@@ -1,14 +1,15 @@
 package com.baas.backend.service.strategy.contract;
 
+import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.model.Transfer;
 import java.util.UUID;
 
 public interface TransferStrategy {
 
-  Object verifyClientRegistry(UUID clientId);
+  void verifyAccounts(UUID sourceAccountId, UUID targetAccountId);
 
-  Object verifyAccounts(UUID sourceAccountId, UUID targetAccountId);
+  Transfer saveTransfer(TransferDto.Request transferRequest);
 
-  Object notifyBacen(Transfer transfer);
+  void notifyBacen(Transfer transfer);
 
 }
