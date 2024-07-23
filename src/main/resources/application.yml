@@ -1,8 +1,21 @@
-spring.application.name:
-  backend
-jpa:
-  database-platform: org.hibernate.dialect.PostgreSQLDialect
-datasource:
-  url: ${SERVICE_TEMPLATE_DBPOSTGRESS_HOST:jdbc:postgresql://localhost:5432/local}
-  username: ${SERVICE_TEMPLATE_DBPOSTGRESS_USERNAME:postgres}
-  password: ${SERVICE_TEMPLATE_DBPOSTGRESS_PASSWORD:postgres}
+spring:
+  application:
+    name: backend
+  datasource:
+    database: local
+    url: jdbc:postgresql://localhost:5432/local
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  sql:
+    init:
+      continue-on-error: true
+      mode: always
+    schema-locations: classpath:/import.sql
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
