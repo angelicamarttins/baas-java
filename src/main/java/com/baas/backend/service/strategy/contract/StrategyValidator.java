@@ -1,6 +1,5 @@
 package com.baas.backend.service.strategy.contract;
 
-import com.baas.backend.model.AccountType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

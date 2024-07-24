@@ -9,7 +9,6 @@ import com.baas.backend.exception.InvalidTransferParametersException;
 import com.baas.backend.model.AccountType;
 import com.baas.backend.model.Transfer;
 import com.baas.backend.model.TransferStatus;
-import com.baas.backend.model.builder.TransferBuilder;
 import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.AccountService;
 import com.baas.backend.service.BacenService;
