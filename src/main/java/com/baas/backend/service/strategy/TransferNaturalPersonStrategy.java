@@ -8,6 +8,7 @@ import com.baas.backend.exception.InsufficientBalanceException;
 import com.baas.backend.exception.InvalidTransferParametersException;
 import com.baas.backend.model.AccountType;
 import com.baas.backend.model.Transfer;
+import com.baas.backend.model.TransferStatus;
 import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.AccountService;
 import com.baas.backend.service.BacenService;
@@ -71,10 +72,11 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
       UUID.randomUUID(),
       transferRequest.customerId(),
       transferRequest.transferAccounts().sourceAccountId(),
-      UUID.randomUUID(),
       transferRequest.transferAccounts().targetAccountId(),
       transferRequest.value(),
+      TransferStatus.PROCESSING,
       LocalDateTime.now(),
+      null,
       null
     );
 

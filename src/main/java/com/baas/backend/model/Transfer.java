@@ -2,6 +2,8 @@ package com.baas.backend.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,6 +41,7 @@ public class Transfer {
   @Column(nullable = false)
   private BigDecimal value;
 
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private TransferStatus status;
 
@@ -50,10 +53,5 @@ public class Transfer {
 
   @Column()
   private LocalDateTime bacenUpdatedAt;
-
-  @PrePersist
-  void onCreate() {
-    this.setCreatedAt(LocalDateTime.now());
-  }
 
 }

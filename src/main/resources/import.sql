@@ -1,10 +1,13 @@
+CREATE TYPE transfer_status AS ENUM ('PROCESSING', 'SUCCESS', 'FAILURE');
+
 CREATE TABLE transfer (
   transfer_id UUID NOT NULL PRIMARY KEY,
-  client_source_id UUID NOT NULL,
+  customer_id UUID NOT NULL,
   source_account_id UUID NOT NULL,
-  client_target_id UUID NOT NULL,
   target_account_id UUID NOT NULL,
   "value" DECIMAL(19, 2) NOT NULL,
+  status transfer_status NOT NULL,
   created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP
+  balance_updated_at TIMESTAMP
+  bacen_updated_at TIMESTAMP
 );
