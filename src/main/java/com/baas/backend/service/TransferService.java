@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class TransferService {
 
   private final TransferValidator transferValidator;
-  private final Map<AccountType, TransferStrategy> strategies;
+  private final Map<String, TransferStrategy> strategies;
 
   public TransferService(TransferValidator transferValidator, StrategyValidator strategyValidator) {
     this.transferValidator = transferValidator;
@@ -28,7 +28,7 @@ public class TransferService {
   public TransferDto.Response processTransfer(TransferDto.Request transferRequest) {
     CustomerDto.Response customer = transferValidator.verifyCustomerRegister(transferRequest.customerId());
 
-    TransferStrategy transferStrategy = strategies.get(AccountType.NATURAL_PERSON);
+    TransferStrategy transferStrategy = strategies.get(customer.accountType().name());
 
     if (Objects.isNull(transferStrategy)) {
       log.info("Strategy with type {} is unavailable.", customer.accountType());

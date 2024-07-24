@@ -12,19 +12,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class StrategyValidator {
 
-  private final Map<AccountType, TransferStrategy> strategies = new HashMap<>();
+  private final Map<String, TransferStrategy> strategies = new HashMap<>();
 
   public StrategyValidator(List<TransferStrategy> strategyList) {
     strategyList.forEach(strategy -> {
       StrategyType annotation = strategy.getClass().getAnnotation(StrategyType.class);
       if (Objects.nonNull(annotation)) {
-        if (strategies.containsKey(annotation.value())) {
+        if (strategies.containsKey(annotation.value().name())) {
           throw new IllegalStateException(
             "Conflict detected! More than one strategy associated "
               + "with the following AccountType: " + annotation.value().name()
           );
         }
-        strategies.put(annotation.value(), strategy);
+        strategies.put(annotation.value().name(), strategy);
       }
     });
   }
