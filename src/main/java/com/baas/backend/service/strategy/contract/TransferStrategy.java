@@ -15,7 +15,7 @@ public interface TransferStrategy {
 
   Transfer saveTransfer(TransferDto.Request transferRequest);
 
-  void notifyBalanceService(TransferDto.Request transferRequest);
+  void notifyBalanceService(Transfer transfer);
 
   void notifyBacenService(Transfer transfer);
 

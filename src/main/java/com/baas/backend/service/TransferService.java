@@ -48,7 +48,7 @@ public class TransferService {
 
     transferStrategy.verifyBalance(accounts.sourceAccount(), transferRequest.value());
     Transfer transfer = transferStrategy.saveTransfer(transferRequest);
-    transferStrategy.notifyBalanceService(transferRequest);
+    transferStrategy.notifyBalanceService(transfer);
     transferStrategy.notifyBacenService(transfer);
 
     log.info(

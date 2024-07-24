@@ -2,10 +2,13 @@ package com.baas.backend.service;
 
 import com.baas.backend.data.dto.AccountDto;
 import com.baas.backend.data.dto.TransferDataDto;
+import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.exception.AccountNotFoundException;
 import com.baas.backend.exception.UnavailableExternalServiceException;
 import com.baas.backend.httpclient.AccountClient;
+import com.baas.backend.model.Transfer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +32,18 @@ public class AccountService {
     }
   }
 
-  public void updateAccountBalance(TransferDataDto.Request transferRequest) {
+  public void updateAccountBalance(Transfer transfer) {
     try {
-      String transferBody = objectMapper.writeValueAsString(transferRequest);
+      TransferDataDto.Request transferDataRequest = new TransferDataDto.Request(
+        transfer.getValue(),
+        new TransferDto.TransferAccounts(
+          transfer.getSourceAccountId(),
+          transfer.getTargetAccountId()
+        )
+      );
+      String transferBody = objectMapper.writeValueAsString(transferDataRequest);
       accountClient.updateAccountBalance(transferBody);
+      transfer.setBalanceUpdatedAt(LocalDateTime.now());
     } catch (Exception exception) {
       String message = "External service for update balance is unavailable";
       log.error(message);
