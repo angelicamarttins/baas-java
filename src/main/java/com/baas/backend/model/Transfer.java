@@ -28,13 +28,10 @@ public class Transfer {
   private UUID transferId;
 
   @Column(nullable = false)
-  private UUID clientSourceId;
+  private UUID customerId;
 
   @Column(nullable = false)
   private UUID sourceAccountId;
-
-  @Column(nullable = false)
-  private UUID clientTargetId;
 
   @Column(nullable = false)
   private UUID targetAccountId;
@@ -43,19 +40,20 @@ public class Transfer {
   private BigDecimal value;
 
   @Column(nullable = false)
+  private TransferStatus status;
+
+  @Column(nullable = false)
   private LocalDateTime createdAt;
 
   @Column()
-  private LocalDateTime updatedAt;
+  private LocalDateTime balanceUpdatedAt;
+
+  @Column()
+  private LocalDateTime bacenUpdatedAt;
 
   @PrePersist
   void onCreate() {
     this.setCreatedAt(LocalDateTime.now());
-  }
-
-  @PreUpdate
-  void onUpdate() {
-    this.setUpdatedAt(LocalDateTime.now());
   }
 
 }
