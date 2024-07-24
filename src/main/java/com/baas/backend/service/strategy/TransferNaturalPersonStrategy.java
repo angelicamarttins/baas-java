@@ -62,21 +62,6 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
   }
 
   @Override
-  public Transfer saveTransfer(TransferDto.Request transferRequest) {
-    log.info(
-      "Saving transfer. SourceAccountId: {}, TargetAccountId: {}",
-      transferRequest.transferAccounts().sourceAccountId(),
-      transferRequest.transferAccounts().targetAccountId()
-    );
-
-    Transfer transfer = TransferBuilder.buildNewTransfer(transferRequest);
-
-    transferRepository.save(transfer);
-
-    return transfer;
-  }
-
-  @Override
   public void notifyBalanceService(Transfer transfer) {
     log.info(
       "Notifying balance external service. SourceAccountId: {}, TargetAccountId: {}",

@@ -4,6 +4,8 @@ import com.baas.backend.data.dto.CustomerDto;
 import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.data.vo.AccountsVo;
 import com.baas.backend.model.Transfer;
+import com.baas.backend.model.builder.TransferBuilder;
+import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.strategy.contract.StrategyValidator;
 import com.baas.backend.service.strategy.contract.TransferStrategy;
 import com.baas.backend.validator.TransferValidator;
@@ -16,10 +18,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransferService {
 
+  private final TransferRepository transferRepository;
   private final TransferValidator transferValidator;
   private final Map<String, TransferStrategy> strategies;
 
-  public TransferService(TransferValidator transferValidator, StrategyValidator strategyValidator) {
+  public TransferService(
+    TransferRepository transferRepository,
+    TransferValidator transferValidator,
+    StrategyValidator strategyValidator
+  ) {
+    this.transferRepository = transferRepository;
     this.transferValidator = transferValidator;
     this.strategies = strategyValidator.getStrategies();
   }
@@ -47,7 +55,7 @@ public class TransferService {
     );
 
     transferStrategy.verifyBalance(accounts.sourceAccount(), transferRequest.value());
-    Transfer transfer = transferStrategy.saveTransfer(transferRequest);
+    Transfer transfer = saveTransfer(transferRequest);
     transferStrategy.notifyBalanceService(transfer);
     transferStrategy.notifyBacenService(transfer);
 
@@ -60,6 +68,19 @@ public class TransferService {
     );
 
     return new TransferDto.Response(transfer.getTransferId());
+  }
+
+  private Transfer saveTransfer(TransferDto.Request transferRequest) {
+    log.info(
+      "Saving transfer. SourceAccountId: {}, TargetAccountId: {}",
+      transferRequest.transferAccounts().sourceAccountId(),
+      transferRequest.transferAccounts().targetAccountId()
+    );
+
+    Transfer transfer = TransferBuilder.buildNewTransfer(transferRequest);
+    transferRepository.save(transfer);
+
+    return transfer;
   }
 
 }
