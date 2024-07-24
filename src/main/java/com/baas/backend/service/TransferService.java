@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -28,16 +27,8 @@ public class TransferService {
 
   public TransferDto.Response processTransfer(TransferDto.Request transferRequest) {
     CustomerDto.Response customer = transferValidator.verifyCustomerRegister(transferRequest.customerId());
-    //    AccountType accountType = switch (customer.accountType()) {
-    //      case Fisica:
-    //        yield AccountType.NATURAL_PERSON;
-    //      case Juridica:
-    //        yield AccountType.LEGAL_PERSON;
-    //    };
-    //    log.info("accountType = {}", accountType);
+
     TransferStrategy transferStrategy = strategies.get(AccountType.NATURAL_PERSON);
-    log.info("strategies = {}", strategies);
-    log.info("CUSTOMER = {}", customer);
 
     if (Objects.isNull(transferStrategy)) {
       log.info("Strategy with type {} is unavailable.", customer.accountType());

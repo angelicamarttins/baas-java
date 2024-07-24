@@ -18,7 +18,6 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -51,7 +50,6 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
   }
 
   @Override
-  @Transactional
   public Transfer saveTransfer(TransferDto.Request transferRequest) {
     Transfer transfer = new Transfer(
       UUID.randomUUID(),
@@ -81,6 +79,6 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
 
   @Override
   public void notifyBacenService(Transfer transfer) {
-  }
 
+  }
 }
