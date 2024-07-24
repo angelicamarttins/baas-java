@@ -10,6 +10,7 @@ import com.baas.backend.model.AccountType;
 import com.baas.backend.model.Transfer;
 import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.AccountService;
+import com.baas.backend.service.BacenService;
 import com.baas.backend.service.strategy.contract.StrategyType;
 import com.baas.backend.service.strategy.contract.TransferStrategy;
 import java.math.BigDecimal;
@@ -27,6 +28,7 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
 
   private final TransferRepository transferRepository;
   private final AccountService accountService;
+  private final BacenService bacenService;
 
   @Override
   public AccountsVo verifyAccounts(UUID sourceAccountId, UUID targetAccountId) {
@@ -105,5 +107,14 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
       transfer.getTargetAccountId()
     );
 
+    TransferDataDto.Request transferDataRequest = new TransferDataDto.Request(
+      transfer.getValue(),
+      new TransferDto.TransferAccounts(
+        transfer.getSourceAccountId(),
+        transfer.getTargetAccountId()
+      )
+    );
+
+    bacenService.notifyBacenSuccessfulTransfer(transferDataRequest);
   }
 }
