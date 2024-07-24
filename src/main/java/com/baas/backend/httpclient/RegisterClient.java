@@ -1,7 +1,7 @@
 package com.baas.backend.httpclient;
 
+import com.baas.backend.data.dto.CustomerDto;
 import com.baas.backend.httpclient.utils.HttpClientUtils;
-import com.baas.backend.model.Customer;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import okhttp3.Request;
@@ -13,7 +13,7 @@ public class RegisterClient {
 
   private final HttpClientUtils httpClientUtils;
 
-  public Customer getCustomer(UUID customerId) {
+  public CustomerDto.Response getCustomer(UUID customerId) {
     Request request = new Request.Builder()
       .get()
       .url(
@@ -25,7 +25,7 @@ public class RegisterClient {
       )
       .build();
 
-    return httpClientUtils.extractBody(request, Customer.class);
+    return httpClientUtils.extractBody(request, CustomerDto.Response.class);
   }
 
 }

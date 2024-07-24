@@ -9,14 +9,14 @@ public class TransferDto {
   public record Request(
     @JsonProperty("idCliente") UUID customerId,
     @JsonProperty("valor") BigDecimal value,
-    @JsonProperty("conta") Accounts accounts
+    @JsonProperty("conta") TransferAccounts transferAccounts
   ) {
   }
 
   public record Response(UUID transferId) {
   }
 
-  public record Accounts(
+  public record TransferAccounts(
     @JsonProperty("idOrigem") UUID sourceAccountId,
     @JsonProperty("idDestino") UUID targetAccountId
   ) {

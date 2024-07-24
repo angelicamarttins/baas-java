@@ -21,10 +21,10 @@ public class TransferController {
   @PostMapping
   public ResponseEntity<TransferDto.Response> transfer(@RequestBody TransferDto.Request transferRequest) {
     log.info(
-      "Starting transfer amount between accounts. ClientId: {}, SourceAccountId: {}, TargetAccountId: {}",
+      "Starting transfer between accounts. CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
       transferRequest.customerId(),
-      transferRequest.accounts().sourceAccountId(),
-      transferRequest.accounts().targetAccountId()
+      transferRequest.transferAccounts().sourceAccountId(),
+      transferRequest.transferAccounts().targetAccountId()
     );
 
     return ResponseEntity.ok(transferService.processTransfer(transferRequest));
