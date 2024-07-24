@@ -7,18 +7,18 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "transfer")
@@ -26,8 +26,8 @@ public class Transfer {
 
   @Id
   @Column(nullable = false)
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID transferId;
+  @Builder.Default
+  private UUID transferId = UUID.randomUUID();
 
   @Column(nullable = false)
   private UUID customerId;
@@ -43,10 +43,12 @@ public class Transfer {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private TransferStatus status;
+  @Builder.Default
+  private TransferStatus status = TransferStatus.PROCESSING;
 
   @Column(nullable = false)
-  private LocalDateTime createdAt;
+  @Builder.Default
+  private LocalDateTime createdAt = LocalDateTime.now();
 
   @Column()
   private LocalDateTime balanceUpdatedAt;

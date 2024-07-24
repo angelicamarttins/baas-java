@@ -9,6 +9,7 @@ import com.baas.backend.exception.InvalidTransferParametersException;
 import com.baas.backend.model.AccountType;
 import com.baas.backend.model.Transfer;
 import com.baas.backend.model.TransferStatus;
+import com.baas.backend.model.builder.TransferBuilder;
 import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.AccountService;
 import com.baas.backend.service.BacenService;
@@ -68,17 +69,7 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
       transferRequest.transferAccounts().targetAccountId()
     );
 
-    Transfer transfer = new Transfer(
-      UUID.randomUUID(),
-      transferRequest.customerId(),
-      transferRequest.transferAccounts().sourceAccountId(),
-      transferRequest.transferAccounts().targetAccountId(),
-      transferRequest.value(),
-      TransferStatus.PROCESSING,
-      LocalDateTime.now(),
-      null,
-      null
-    );
+    Transfer transfer = TransferBuilder.buildNewTransfer(transferRequest);
 
     transferRepository.save(transfer);
 
@@ -86,19 +77,16 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
   }
 
   @Override
-  public void notifyBalanceService(TransferDto.Request transferRequest) {
+  public void notifyBalanceService(Transfer transfer) {
     log.info(
       "Notifying balance external service. SourceAccountId: {}, TargetAccountId: {}",
-      transferRequest.transferAccounts().sourceAccountId(),
-      transferRequest.transferAccounts().targetAccountId()
+      transfer.getSourceAccountId(),
+      transfer.getTargetAccountId()
     );
 
-    TransferDataDto.Request transferDataRequest = new TransferDataDto.Request(
-      transferRequest.value(),
-      transferRequest.transferAccounts()
-    );
-
-    accountService.updateAccountBalance(transferDataRequest);
+    accountService.updateAccountBalance(transfer);
+    transfer.setBalanceUpdatedAt(LocalDateTime.now());
+    transferRepository.save(transfer);
   }
 
   @Override
@@ -118,5 +106,8 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
     );
 
     bacenService.notifyBacenSuccessfulTransfer(transferDataRequest);
+    transfer.setBacenUpdatedAt(LocalDateTime.now());
+    transfer.setStatus(TransferStatus.SUCCESS);
+    transferRepository.save(transfer);
   }
 }
