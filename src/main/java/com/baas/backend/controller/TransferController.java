@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/transfer")
@@ -20,13 +19,6 @@ public class TransferController {
 
   @PostMapping
   public ResponseEntity<TransferDto.Response> transfer(@RequestBody TransferDto.Request transferRequest) {
-    log.info(
-      "Starting transfer between accounts. CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
-      transferRequest.customerId(),
-      transferRequest.transferAccounts().sourceAccountId(),
-      transferRequest.transferAccounts().targetAccountId()
-    );
-
     return ResponseEntity.ok(transferService.processTransfer(transferRequest));
   }
 

@@ -30,6 +30,12 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
 
   @Override
   public AccountsVo verifyAccounts(UUID sourceAccountId, UUID targetAccountId) {
+    log.info(
+      "Checking accounts. SourceAccountId: {}, TargetAccountId: {}",
+      sourceAccountId,
+      targetAccountId
+    );
+
     AccountDto.Response sourceAccount = accountService.findAccount(sourceAccountId);
     AccountDto.Response targetAccount = accountService.findAccount(targetAccountId);
 
@@ -42,6 +48,8 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
 
   @Override
   public void verifyBalance(AccountDto.Response sourceAccount, BigDecimal value) {
+    log.info("Checking balance. SourceAccountId: {}", sourceAccount.accountId());
+
     BigDecimal balance = sourceAccount.balance().add(sourceAccount.dailyLimit());
 
     if (balance.compareTo(value) < 0) {
@@ -51,6 +59,12 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
 
   @Override
   public Transfer saveTransfer(TransferDto.Request transferRequest) {
+    log.info(
+      "Saving transfer. SourceAccountId: {}, TargetAccountId: {}",
+      transferRequest.transferAccounts().sourceAccountId(),
+      transferRequest.transferAccounts().targetAccountId()
+    );
+
     Transfer transfer = new Transfer(
       UUID.randomUUID(),
       transferRequest.customerId(),
@@ -69,6 +83,12 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
 
   @Override
   public void notifyBalanceService(TransferDto.Request transferRequest) {
+    log.info(
+      "Notifying balance external service. SourceAccountId: {}, TargetAccountId: {}",
+      transferRequest.transferAccounts().sourceAccountId(),
+      transferRequest.transferAccounts().targetAccountId()
+    );
+
     TransferDataDto.Request transferDataRequest = new TransferDataDto.Request(
       transferRequest.value(),
       transferRequest.transferAccounts()
@@ -79,6 +99,11 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
 
   @Override
   public void notifyBacenService(Transfer transfer) {
+    log.info(
+      "Notifying Bacen external service. SourceAccountId: {}, TargetAccountId: {}",
+      transfer.getSourceAccountId(),
+      transfer.getTargetAccountId()
+    );
 
   }
 }

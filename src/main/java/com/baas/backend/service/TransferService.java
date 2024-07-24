@@ -3,7 +3,6 @@ package com.baas.backend.service;
 import com.baas.backend.data.dto.CustomerDto;
 import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.data.vo.AccountsVo;
-import com.baas.backend.model.AccountType;
 import com.baas.backend.model.Transfer;
 import com.baas.backend.service.strategy.contract.StrategyValidator;
 import com.baas.backend.service.strategy.contract.TransferStrategy;
@@ -26,6 +25,13 @@ public class TransferService {
   }
 
   public TransferDto.Response processTransfer(TransferDto.Request transferRequest) {
+    log.info(
+      "Starting transfer between accounts. CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
+      transferRequest.customerId(),
+      transferRequest.transferAccounts().sourceAccountId(),
+      transferRequest.transferAccounts().targetAccountId()
+    );
+
     CustomerDto.Response customer = transferValidator.verifyCustomerRegister(transferRequest.customerId());
 
     TransferStrategy transferStrategy = strategies.get(customer.accountType().name());
@@ -44,6 +50,14 @@ public class TransferService {
     Transfer transfer = transferStrategy.saveTransfer(transferRequest);
     transferStrategy.notifyBalanceService(transferRequest);
     transferStrategy.notifyBacenService(transfer);
+
+    log.info(
+      "Transfer occurred successfully. TransferId: {}, CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
+      transfer.getTransferId(),
+      transferRequest.customerId(),
+      transferRequest.transferAccounts().sourceAccountId(),
+      transferRequest.transferAccounts().targetAccountId()
+    );
 
     return new TransferDto.Response(transfer.getTransferId());
   }
