@@ -4,8 +4,8 @@ import com.baas.backend.data.dto.AccountDto;
 import com.baas.backend.data.dto.TransferDataDto;
 import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.data.vo.AccountsVo;
+import com.baas.backend.exception.InactiveAccountException;
 import com.baas.backend.exception.InsufficientBalanceException;
-import com.baas.backend.exception.InvalidTransferParametersException;
 import com.baas.backend.model.AccountType;
 import com.baas.backend.model.Transfer;
 import com.baas.backend.model.TransferStatus;
@@ -43,7 +43,7 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
     AccountDto.Response targetAccount = accountService.findAccount(targetAccountId);
 
     if (!sourceAccount.activeAccount() || !targetAccount.activeAccount()) {
-      throw new InvalidTransferParametersException("The source or destination account is inactive");
+      throw new InactiveAccountException("The source or target account is inactive");
     }
 
     return new AccountsVo(sourceAccount, targetAccount);
