@@ -11,6 +11,7 @@ import com.baas.backend.service.strategy.contract.TransferStrategy;
 import com.baas.backend.validator.TransferValidator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,8 @@ public class TransferService {
     this.strategies = strategyValidator.getStrategies();
   }
 
-  public TransferDto.Response processTransfer(TransferDto.Request transferRequest) {
+  public TransferDto.Response processTransfer(TransferDto.Request transferRequest)
+    throws ExecutionException, InterruptedException {
     log.info(
       "Starting transfer between accounts. CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
       transferRequest.targetId(),

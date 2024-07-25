@@ -22,6 +22,12 @@ public class BacenService {
   private final ObjectMapper objectMapper;
 
   public void notifyBacenService(Transfer transfer) {
+    log.info(
+      "Notifying Bacen external service. SourceAccountId: {}, TargetAccountId: {}",
+      transfer.getSourceAccountId(),
+      transfer.getTargetAccountId()
+    );
+
     TransferDataDto.Request transferDataRequest = new TransferDataDto.Request(
       transfer.getValue(),
       new TransferDto.TransferAccounts(

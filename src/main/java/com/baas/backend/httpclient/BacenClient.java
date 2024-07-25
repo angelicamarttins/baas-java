@@ -15,6 +15,9 @@ public class BacenClient {
 
   private final HttpClientUtils httpClientUtils;
 
+  //  @TimeLimiter(name = "externalService")
+  //  @CircuitBreaker(name = "externalService")
+  //  @Retry(name = "externalService")
   public void notifyBacenSuccessfulTransfer(String transferData) {
     new Request.Builder()
       .post(RequestBody.create(transferData, MediaType.get(APPLICATION_JSON_VALUE)))

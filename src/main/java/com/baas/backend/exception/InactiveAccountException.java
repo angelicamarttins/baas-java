@@ -1,7 +1,10 @@
 package com.baas.backend.exception;
 
-public class InactiveAccountException extends RuntimeException {
+import com.baas.backend.exception.common.ErrorData;
+import com.baas.backend.exception.common.GeneralHttpException;
+
+public class InactiveAccountException extends GeneralHttpException {
   public InactiveAccountException(String message) {
-    super(message);
+    super(new ErrorData(message, null));
   }
 }

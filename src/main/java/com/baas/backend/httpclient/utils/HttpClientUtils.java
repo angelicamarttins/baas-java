@@ -1,8 +1,6 @@
 package com.baas.backend.httpclient.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.util.Objects;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -11,6 +9,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import java.io.IOException;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -34,6 +34,8 @@ public class HttpClientUtils {
   public <T> T extractBody(Request request, Class<T> clazz) {
     try (Response response = client.newCall(request).execute()) {
       String responseBody = Objects.requireNonNull(response.body()).string();
+      log.info("code: {}, message: {}", response.code(), response.message());
+
       return objectMapper.readValue(responseBody, clazz);
     } catch (IOException exception) {
       log.error(

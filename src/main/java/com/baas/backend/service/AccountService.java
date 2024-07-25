@@ -8,10 +8,10 @@ import com.baas.backend.exception.UnavailableExternalServiceException;
 import com.baas.backend.httpclient.AccountClient;
 import com.baas.backend.model.Transfer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -47,7 +47,7 @@ public class AccountService {
       String message = "External service for update balance is unavailable";
       log.error(message);
 
-      throw new UnavailableExternalServiceException(message, exception);
+      throw new UnavailableExternalServiceException(message, HttpStatus.BAD_REQUEST, exception);
     }
   }
 

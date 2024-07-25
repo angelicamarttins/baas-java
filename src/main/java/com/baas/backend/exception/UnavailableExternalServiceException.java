@@ -1,19 +1,15 @@
 package com.baas.backend.exception;
 
-public class UnavailableExternalServiceException extends RuntimeException {
-  public UnavailableExternalServiceException() {
-    super();
+import com.baas.backend.exception.common.ErrorData;
+import com.baas.backend.exception.common.GeneralHttpException;
+import org.springframework.http.HttpStatus;
+
+public class UnavailableExternalServiceException extends GeneralHttpException {
+  public UnavailableExternalServiceException(String message, HttpStatus httpStatus) {
+    super(new ErrorData(message, httpStatus));
   }
 
-  public UnavailableExternalServiceException(String message) {
-    super(message);
-  }
-
-  public UnavailableExternalServiceException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public UnavailableExternalServiceException(Throwable cause) {
-    super(cause);
+  public UnavailableExternalServiceException(String message, HttpStatus httpStatus, Throwable cause) {
+    super(new ErrorData(message, httpStatus), cause);
   }
 }

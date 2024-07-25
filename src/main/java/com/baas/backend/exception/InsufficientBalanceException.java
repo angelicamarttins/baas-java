@@ -1,7 +1,10 @@
 package com.baas.backend.exception;
 
-public class InsufficientBalanceException extends RuntimeException {
+import com.baas.backend.exception.common.ErrorData;
+import com.baas.backend.exception.common.GeneralHttpException;
+
+public class InsufficientBalanceException extends GeneralHttpException {
   public InsufficientBalanceException() {
-    super("Insufficient balance for transfer");
+    super(new ErrorData("Insufficient balance for transfer", null));
   }
 }

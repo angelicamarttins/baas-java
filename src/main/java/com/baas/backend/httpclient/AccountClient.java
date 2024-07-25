@@ -17,6 +17,9 @@ public class AccountClient {
 
   private final HttpClientUtils httpClientUtils;
 
+  //  @CircuitBreaker(name = "externalService")
+  //  @Retry(name = "externalService")
+  //  @TimeLimiter(name = "externalService")
   public AccountDto.Response getAccount(UUID accountId) {
     Request request = new Request.Builder()
       .get()
@@ -32,6 +35,9 @@ public class AccountClient {
     return httpClientUtils.extractBody(request, AccountDto.Response.class);
   }
 
+  //  @TimeLimiter(name = "externalService")
+  //  @CircuitBreaker(name = "externalService")
+  //  @Retry(name = "externalService")
   public void updateAccountBalance(String transferData) {
     new Request.Builder()
       .post(RequestBody.create(transferData, MediaType.get(APPLICATION_JSON_VALUE)))

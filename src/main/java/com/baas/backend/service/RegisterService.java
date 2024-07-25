@@ -4,6 +4,7 @@ import com.baas.backend.data.dto.CustomerDto;
 import com.baas.backend.exception.CustomerNotFoundException;
 import com.baas.backend.httpclient.RegisterClient;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,13 @@ public class RegisterService {
 
   private final RegisterClient registerClient;
 
-  public CustomerDto.Response findCustomer(UUID customerId) {
-    try {
-      return registerClient.getCustomer(customerId);
-    } catch (Exception exception) {
-      log.error("Customer not found. CustomerId: {}", customerId);
-
-      throw new CustomerNotFoundException(customerId);
-    }
+  public CompletableFuture<CustomerDto.Response> findCustomer(UUID customerId) {
+    return registerClient.getCustomer(customerId)
+      .exceptionally(exception -> {
+        log.error("Customer not found. CustomerId: {}", customerId);
+        throw new CustomerNotFoundException(customerId);
+      });
   }
+
 
 }

@@ -7,7 +7,7 @@ spring:
     username: postgres
     password: postgres
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
   sql:
@@ -19,4 +19,26 @@ spring:
     serialization:
       fail-on-empty-beans: false
 external-services:
-    url: http://localhost:9090
+  url: http://localhost:9090
+resilience4j:
+  retry:
+    instances:
+      externalService:
+        maxAttempts: 3
+        waitDuration: 500ms
+  circuitbreaker:
+    instances:
+      externalService:
+        registerHealthIndicator: true
+        ringBufferSizeInClosedState: 5
+        ringBufferSizeInHalfOpenState: 2
+        waitDurationInOpenState: 5000ms
+        failureRateThreshold: 50
+  timelimiter:
+    instances:
+      externalService:
+        timeoutDuration: 2s
+logging:
+  level:
+    root: INFO
+    io.github.resilience4j: DEBUG
