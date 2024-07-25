@@ -14,6 +14,4 @@ public interface TransferStrategy {
 
   void notifyBalanceService(Transfer transfer);
 
-  void notifyBacenService(Transfer transfer);
-
 }

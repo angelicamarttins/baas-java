@@ -8,7 +8,7 @@ public class TransferBuilder {
   public static Transfer buildNewTransfer(TransferDto.Request transferRequest) {
     return Transfer
       .builder()
-      .customerId(transferRequest.customerId())
+      .targetId(transferRequest.targetId())
       .sourceAccountId(transferRequest.transferAccounts().sourceAccountId())
       .targetAccountId(transferRequest.transferAccounts().targetAccountId())
       .value(transferRequest.value())

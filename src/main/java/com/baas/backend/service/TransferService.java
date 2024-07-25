@@ -18,15 +18,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransferService {
 
+  private final BacenService bacenService;
   private final TransferRepository transferRepository;
   private final TransferValidator transferValidator;
   private final Map<String, TransferStrategy> strategies;
 
   public TransferService(
+    BacenService bacenService,
     TransferRepository transferRepository,
     TransferValidator transferValidator,
     StrategyValidator strategyValidator
   ) {
+    this.bacenService = bacenService;
     this.transferRepository = transferRepository;
     this.transferValidator = transferValidator;
     this.strategies = strategyValidator.getStrategies();
@@ -35,18 +38,18 @@ public class TransferService {
   public TransferDto.Response processTransfer(TransferDto.Request transferRequest) {
     log.info(
       "Starting transfer between accounts. CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
-      transferRequest.customerId(),
+      transferRequest.targetId(),
       transferRequest.transferAccounts().sourceAccountId(),
       transferRequest.transferAccounts().targetAccountId()
     );
 
-    CustomerDto.Response customer = transferValidator.verifyCustomerRegister(transferRequest.customerId());
+    CustomerDto.Response targetCustomer = transferValidator.verifyCustomerRegister(transferRequest.targetId());
 
-    TransferStrategy transferStrategy = strategies.get(customer.accountType().name());
+    TransferStrategy transferStrategy = strategies.get(targetCustomer.accountType().name());
 
     if (Objects.isNull(transferStrategy)) {
-      log.info("Strategy with type {} is unavailable.", customer.accountType());
-      throw new IllegalStateException("Strategy not found for " + customer.accountType());
+      log.info("Strategy with type {} is unavailable.", targetCustomer.accountType());
+      throw new IllegalStateException("Strategy not found for " + targetCustomer.accountType());
     }
 
     AccountsVo accounts = transferStrategy.verifyAccounts(
@@ -57,12 +60,12 @@ public class TransferService {
     transferStrategy.verifyBalance(accounts.sourceAccount(), transferRequest.value());
     Transfer transfer = saveTransfer(transferRequest);
     transferStrategy.notifyBalanceService(transfer);
-    transferStrategy.notifyBacenService(transfer);
+    bacenService.notifyBacenService(transfer);
 
     log.info(
       "Transfer occurred successfully. TransferId: {}, CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
       transfer.getTransferId(),
-      transferRequest.customerId(),
+      transferRequest.targetId(),
       transferRequest.transferAccounts().sourceAccountId(),
       transferRequest.transferAccounts().targetAccountId()
     );

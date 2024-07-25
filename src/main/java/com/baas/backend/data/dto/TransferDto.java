@@ -7,7 +7,7 @@ import java.util.UUID;
 public class TransferDto {
 
   public record Request(
-    @JsonProperty("idCliente") UUID customerId,
+    @JsonProperty("idCliente") UUID targetId,
     @JsonProperty("valor") BigDecimal value,
     @JsonProperty("conta") TransferAccounts transferAccounts
   ) {

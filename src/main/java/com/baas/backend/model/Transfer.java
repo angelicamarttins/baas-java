@@ -28,10 +28,10 @@ public class Transfer {
   private UUID transferId = UUID.randomUUID();
 
   @Column(nullable = false)
-  private UUID customerId;
+  private UUID sourceAccountId;
 
   @Column(nullable = false)
-  private UUID sourceAccountId;
+  private UUID targetId;
 
   @Column(nullable = false)
   private UUID targetAccountId;

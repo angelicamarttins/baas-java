@@ -1,17 +1,14 @@
 package com.baas.backend.service.strategy;
 
 import com.baas.backend.data.dto.AccountDto;
-import com.baas.backend.data.dto.TransferDataDto;
-import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.data.vo.AccountsVo;
 import com.baas.backend.exception.InactiveAccountException;
 import com.baas.backend.exception.InsufficientBalanceException;
+import com.baas.backend.httpclient.BacenClient;
 import com.baas.backend.model.AccountType;
 import com.baas.backend.model.Transfer;
-import com.baas.backend.model.TransferStatus;
 import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.AccountService;
-import com.baas.backend.service.BacenService;
 import com.baas.backend.service.strategy.contract.StrategyType;
 import com.baas.backend.service.strategy.contract.TransferStrategy;
 import java.math.BigDecimal;
@@ -29,7 +26,7 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
 
   private final TransferRepository transferRepository;
   private final AccountService accountService;
-  private final BacenService bacenService;
+  private final BacenClient bacenClient;
 
   @Override
   public AccountsVo verifyAccounts(UUID sourceAccountId, UUID targetAccountId) {
@@ -52,11 +49,11 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
   @Override
   public void verifyBalance(AccountDto.Response sourceAccount, BigDecimal value) {
     log.info("Checking balance. SourceAccountId: {}", sourceAccount.accountId());
+    boolean hasBalance = value.compareTo(sourceAccount.balance()) <= 0
+      && value.compareTo(sourceAccount.dailyLimit()) <= 0;
 
-    BigDecimal balance = sourceAccount.balance().add(sourceAccount.dailyLimit());
-
-    if (balance.compareTo(value) < 0) {
-      throw new InsufficientBalanceException(value, balance);
+    if (!hasBalance) {
+      throw new InsufficientBalanceException();
     }
   }
 
@@ -73,25 +70,4 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
     transferRepository.save(transfer);
   }
 
-  @Override
-  public void notifyBacenService(Transfer transfer) {
-    log.info(
-      "Notifying Bacen external service. SourceAccountId: {}, TargetAccountId: {}",
-      transfer.getSourceAccountId(),
-      transfer.getTargetAccountId()
-    );
-
-    TransferDataDto.Request transferDataRequest = new TransferDataDto.Request(
-      transfer.getValue(),
-      new TransferDto.TransferAccounts(
-        transfer.getSourceAccountId(),
-        transfer.getTargetAccountId()
-      )
-    );
-
-    bacenService.notifyBacenSuccessfulTransfer(transferDataRequest);
-    transfer.setBacenUpdatedAt(LocalDateTime.now());
-    transfer.setStatus(TransferStatus.SUCCESS);
-    transferRepository.save(transfer);
-  }
 }

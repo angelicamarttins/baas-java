@@ -2,7 +2,7 @@ CREATE TYPE transfer_status AS ENUM ('PROCESSING', 'SUCCESS', 'FAILURE');
 
 CREATE TABLE transfer (
   transfer_id UUID NOT NULL PRIMARY KEY,
-  customer_id UUID NOT NULL,
+  transfer_id UUID NOT NULL,
   source_account_id UUID NOT NULL,
   target_account_id UUID NOT NULL,
   "value" DECIMAL(19, 2) NOT NULL,

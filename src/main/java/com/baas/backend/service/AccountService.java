@@ -43,7 +43,6 @@ public class AccountService {
       );
       String transferBody = objectMapper.writeValueAsString(transferDataRequest);
       accountClient.updateAccountBalance(transferBody);
-      transfer.setBalanceUpdatedAt(LocalDateTime.now());
     } catch (Exception exception) {
       String message = "External service for update balance is unavailable";
       log.error(message);
