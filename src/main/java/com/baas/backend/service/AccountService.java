@@ -10,6 +10,7 @@ import com.baas.backend.model.Transfer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,33 +23,37 @@ public class AccountService {
   private final AccountClient accountClient;
   private final ObjectMapper objectMapper;
 
+  @SneakyThrows
   public AccountDto.Response findAccount(UUID accountId) {
-    try {
-      return accountClient.getAccount(accountId);
-    } catch (Exception exception) {
-      log.error("Account not found. AccountId: {}", accountId);
+    return accountClient.getAccount(accountId)
+      .exceptionally(exception -> {
+        log.error("Account not found. AccountId: {}", accountId);
 
-      throw new AccountNotFoundException(accountId);
-    }
+        throw new AccountNotFoundException(accountId);
+      })
+      .get();
   }
 
+  @SneakyThrows
   public void updateAccountBalance(Transfer transfer) {
-    try {
-      TransferDataDto.Request transferDataRequest = new TransferDataDto.Request(
-        transfer.getValue(),
-        new TransferDto.TransferAccounts(
-          transfer.getSourceAccountId(),
-          transfer.getTargetAccountId()
-        )
-      );
-      String transferBody = objectMapper.writeValueAsString(transferDataRequest);
-      accountClient.updateAccountBalance(transferBody);
-    } catch (Exception exception) {
-      String message = "External service for update balance is unavailable";
-      log.error(message);
+    TransferDataDto.Request transferDataRequest = new TransferDataDto.Request(
+      transfer.getValue(),
+      new TransferDto.TransferAccounts(
+        transfer.getSourceAccountId(),
+        transfer.getTargetAccountId()
+      )
+    );
+    String transferBody = objectMapper.writeValueAsString(transferDataRequest);
 
-      throw new UnavailableExternalServiceException(message, HttpStatus.BAD_REQUEST, exception);
-    }
+    accountClient.updateAccountBalance(transferBody)
+      .exceptionally(exception -> {
+        String message = "External service for update balance is unavailable";
+        log.error(message);
+
+        throw new UnavailableExternalServiceException(message, HttpStatus.SERVICE_UNAVAILABLE, exception);
+      })
+      .get();
+
   }
 
 }

@@ -25,19 +25,22 @@ resilience4j:
     instances:
       externalService:
         maxAttempts: 3
-        waitDuration: 500ms
+        waitDuration: 1000
   circuitbreaker:
     instances:
       externalService:
         registerHealthIndicator: true
-        ringBufferSizeInClosedState: 5
-        ringBufferSizeInHalfOpenState: 2
-        waitDurationInOpenState: 5000ms
+        slidingWindowSize: 10
         failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
   timelimiter:
     instances:
       externalService:
-        timeoutDuration: 2s
+        timeoutDuration: 3000
 logging:
   level:
     root: INFO
