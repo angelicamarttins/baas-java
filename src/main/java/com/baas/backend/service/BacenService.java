@@ -8,6 +8,7 @@ import com.baas.backend.model.Transfer;
 import com.baas.backend.model.TransferStatus;
 import com.baas.backend.repository.TransferRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -21,10 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class BacenService {
 
-  private final TransferRepository transferRepository;
   private final BacenClient bacenClient;
-  private final ReprocessBacenProducer reprocessBacenProducer;
   private final ObjectMapper objectMapper;
+  private final RedisService redisService;
+  private final ReprocessBacenProducer reprocessBacenProducer;
+  private final TransferRepository transferRepository;
 
   @SneakyThrows
   @Transactional
@@ -49,6 +51,7 @@ public class BacenService {
         log.error("External service to notify Bacen is unavailable");
 
         if (reprocessTransfer) {
+          redisService.set(transfer.getTransferId().toString(), transfer, Duration.ofMinutes(30));
           reprocessBacenProducer.publish(transfer);
         }
         return null;

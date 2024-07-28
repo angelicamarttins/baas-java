@@ -6,6 +6,10 @@ import com.baas.backend.exception.common.ErrorData;
 import com.baas.backend.model.Transfer;
 import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.BacenService;
+import com.baas.backend.service.RedisService;
+import java.time.Duration;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Component;
 public class ReprocessBacenConsumer {
 
   private final BacenService bacenService;
+  private final RedisService redisService;
   private final TransferRepository transferRepository;
 
   @KafkaListener(
@@ -36,15 +41,7 @@ public class ReprocessBacenConsumer {
     );
 
     try {
-      Transfer transfer = transferRepository
-        .findById(record.value().getTransferId())
-        .orElseThrow(() -> {
-          ErrorData errorData = new ErrorData(
-            "Transfer not found. TransferId: " + record.value().getTransferId(),
-            HttpStatus.NOT_FOUND
-          );
-          return new TransferNotFoundException(errorData);
-        });
+
 
       bacenService.notifyBacenService(transfer, false);
     } catch (Exception exception) {
@@ -55,6 +52,28 @@ public class ReprocessBacenConsumer {
     } finally {
       ack.acknowledge();
     }
+  }
+
+  private Transfer getTransfer(UUID transferId) {
+    Transfer cachedTransfer = (Transfer) redisService.get(transferId.toString());
+
+    if (Objects.isNull(cachedTransfer)) {
+      Transfer transfer = transferRepository
+        .findById(transferId)
+        .orElseThrow(() -> {
+          ErrorData errorData = new ErrorData(
+            "Transfer not found. TransferId: " + transferId,
+            HttpStatus.NOT_FOUND
+          );
+          return new TransferNotFoundException(errorData);
+        });
+
+      redisService.set(transferId.toString(), transfer, Duration.ofMinutes(30));
+
+      return transfer;
+    }
+
+    return cachedTransfer;
   }
 
 }

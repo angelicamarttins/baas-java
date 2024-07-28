@@ -19,7 +19,13 @@ public class TransferValidator {
   private final RegisterService registerService;
 
   public CustomerDto.Response verifyTargetRegister(Transfer transfer) {
-    log.info("Searching customer. TargetId: {}", transfer.getTargetId());
+    log.info(
+      "Searching customer. TransferId: {}, TargetId: {}, SourceAccountId: {}, TargetAccountId: {}",
+      transfer.getTargetId(),
+      transfer.getTargetId(),
+      transfer.getSourceAccountId(),
+      transfer.getTargetAccountId()
+    );
 
     CustomerDto.Response cachedCustomer = (CustomerDto.Response) redisService.get(transfer.getTargetId().toString());
 

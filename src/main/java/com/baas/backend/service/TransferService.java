@@ -63,11 +63,11 @@ public class TransferService {
     bacenService.notifyBacenService(transfer, true);
 
     log.info(
-      "Transfer occurred successfully. TransferId: {}, CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
+      "Transfer occurred successfully. TransferId: {}, TargetId: {}, SourceAccountId: {}, TargetAccountId: {}",
       transfer.getTransferId(),
-      transferRequest.targetId(),
-      transferRequest.transferAccounts().sourceAccountId(),
-      transferRequest.transferAccounts().targetAccountId()
+      transfer.getTargetId(),
+      transfer.getSourceAccountId(),
+      transfer.getTargetAccountId()
     );
 
     return new TransferDto.Response(transfer.getTransferId());

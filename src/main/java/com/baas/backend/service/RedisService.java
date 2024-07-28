@@ -1,9 +1,9 @@
 package com.baas.backend.service;
 
+import java.time.Duration;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import java.time.Duration;
 
 @Service
 @AllArgsConstructor
