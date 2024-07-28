@@ -1,3 +1,18 @@
+import org.apache.avro.tool.SpecificCompilerTool
+
+buildscript {
+  dependencies {
+    classpath 'org.apache.avro:avro-tools:1.11.3'
+  }
+
+  repositories {
+    mavenCentral()
+    maven {
+      url 'https://packages.confluent.io/maven'
+    }
+  }
+}
+
 plugins {
   id 'java'
   id 'org.springframework.boot' version '3.3.2'
@@ -7,6 +22,11 @@ plugins {
 
 group = 'com.baas'
 version = '0.0.1-SNAPSHOT'
+
+def avroSchemasDir = "src/main/avro"
+def avroCodeGenerationDir = "build/generated-main-avro-java"
+
+sourceSets.main.java.srcDirs += [avroCodeGenerationDir]
 
 java {
   toolchain {
@@ -22,6 +42,9 @@ configurations {
 
 repositories {
   mavenCentral()
+  maven {
+    url "https://packages.confluent.io/maven"
+  }
 }
 
 dependencies {
@@ -30,12 +53,21 @@ dependencies {
   implementation 'org.postgresql:postgresql:42.7.3'
   implementation 'com.squareup.okhttp3:okhttp:4.12.0'
   implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+  implementation "org.springframework.kafka:spring-kafka"
+  implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+  implementation 'redis.clients:jedis:4.3.1'
+
+  implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-avro:2.17.0'
+
+  implementation 'org.apache.avro:avro:1.11.3'
+  implementation 'io.confluent:kafka-avro-serializer:7.6.0'
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.boot:spring-boot-testcontainers'
   testImplementation 'org.testcontainers:junit-jupiter'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+  compileOnly 'org.apache.avro:avro-tools:1.11.3'
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'
 }
@@ -49,4 +81,22 @@ checkstyle {
   ignoreFailures = false
   maxWarnings = 0
   maxErrors = 0
+}
+
+tasks.register('customAvroCodeGeneration') {
+  inputs.dir(avroSchemasDir)
+  outputs.dir(avroCodeGenerationDir)
+  doLast {
+    new SpecificCompilerTool().run(System.in, System.out, System.err, List.of(
+      "-encoding", "UTF-8",
+      "-string",
+      "-fieldVisibility", "private",
+      "-noSetters",
+      "schema", "$projectDir/$avroSchemasDir".toString(), "$projectDir/$avroCodeGenerationDir".toString()
+    ))
+  }
+}
+
+tasks.withType(JavaCompile).configureEach {
+  dependsOn('customAvroCodeGeneration')
 }

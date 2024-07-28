@@ -1,5 +1,6 @@
-package com.baas.backend.httpclient.config;
+package com.baas.backend.config;
 
+import com.baas.backend.httpclient.config.ErrorResponseInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;

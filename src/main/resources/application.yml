@@ -18,6 +18,28 @@ spring:
   jackson:
     serialization:
       fail-on-empty-beans: false
+  kafka:
+    bootstrap-servers: localhost:29092
+    properties:
+      schema.registry.url: http://0.0.0.0:8081
+    listener:
+      ack-mode: manual
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        spring.json.trusted.packages: com.baas.backend.event.dto
+        specific.avro.reader: true
+    security.protocol: PLAINTEXT
+    topics:
+      reprocess-bacen:
+        name: reprocess-bacen
+        group: reprocess-bacen-service
 external-services:
   url: http://localhost:9090
 resilience4j:
@@ -26,13 +48,37 @@ resilience4j:
       externalService:
         maxAttempts: 3
         waitDuration: 1000
+        ignoreExceptions: com.baas.backend.exception.TooManyRequestClientException
+        exponentialBackoff:
+          enabled: true
+          initialInterval: 1000
+          multiplier: 2
+          maxInterval: 3000
   circuitbreaker:
     instances:
-      externalService:
+      register:
         registerHealthIndicator: true
         slidingWindowSize: 10
         failureRateThreshold: 50
-        waitDurationInOpenState: 10000
+        waitDurationInOpenState: 1000
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+      accounts:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 1000
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+      bacen:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 1000
         permittedNumberOfCallsInHalfOpenState: 3
         slidingWindowType: COUNT_BASED
         minimumNumberOfCalls: 5

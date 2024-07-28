@@ -1,6 +1,7 @@
 package com.baas.backend.httpclient.config;
 
 import com.baas.backend.exception.ClientException;
+import com.baas.backend.exception.TooManyRequestClientException;
 import com.baas.backend.exception.common.ErrorData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -42,9 +43,13 @@ public class ErrorResponseInterceptor implements Interceptor {
           .append(request.url())
           .toString();
 
-        ErrorData errorData = new ErrorData(errorReason, HttpStatus.SERVICE_UNAVAILABLE);
 
         response.close();
+
+        ErrorData errorData = new ErrorData(errorReason, HttpStatus.SERVICE_UNAVAILABLE);
+        if (isErrorTooManyRequest(statusCode)) {
+          throw new TooManyRequestClientException(errorData, HttpStatus.valueOf(statusCode));
+        }
 
         throw new ClientException(errorData, HttpStatus.valueOf(statusCode));
       }
@@ -69,5 +74,9 @@ public class ErrorResponseInterceptor implements Interceptor {
 
   private boolean isErrorStatusCode(int statusCode) {
     return HttpStatus.valueOf(statusCode).isError();
+  }
+
+  private boolean isErrorTooManyRequest(int statusCode) {
+    return HttpStatus.valueOf(statusCode).isSameCodeAs(HttpStatus.TOO_MANY_REQUESTS);
   }
 }

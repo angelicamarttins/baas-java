@@ -2,6 +2,7 @@ package com.baas.backend.service;
 
 import com.baas.backend.data.dto.TransferDataDto;
 import com.baas.backend.data.dto.TransferDto;
+import com.baas.backend.event.producer.ReprocessBacenProducer;
 import com.baas.backend.httpclient.BacenClient;
 import com.baas.backend.model.Transfer;
 import com.baas.backend.model.TransferStatus;
@@ -13,6 +14,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,10 +23,12 @@ public class BacenService {
 
   private final TransferRepository transferRepository;
   private final BacenClient bacenClient;
+  private final ReprocessBacenProducer reprocessBacenProducer;
   private final ObjectMapper objectMapper;
 
   @SneakyThrows
-  public void notifyBacenService(Transfer transfer) {
+  @Transactional
+  public void notifyBacenService(Transfer transfer, boolean reprocessTransfer) {
     log.info(
       "Notifying Bacen external service. SourceAccountId: {}, TargetAccountId: {}",
       transfer.getSourceAccountId(),
@@ -43,18 +47,21 @@ public class BacenService {
     TransferDataDto.Response response = bacenClient.notifyBacenSuccessfulTransfer(transferBody)
       .exceptionally(exception -> {
         log.error("External service to notify Bacen is unavailable");
-        //chama dlt -> Pode entrar em looping -> Repensar estrutura
+
+        if (reprocessTransfer) {
+          reprocessBacenProducer.publish(transfer);
+        }
         return null;
       })
       .get();
 
     if (response != null && !HttpStatus.valueOf(response.code()).isError()) {
-      transfer.setBacenUpdatedAt(LocalDateTime.now());
-      transfer.setStatus(TransferStatus.SUCCESS);
-      transferRepository.save(transfer);
+      transferRepository.updateTransferAfterBacenNotification(
+        transfer.getTransferId(),
+        LocalDateTime.now(),
+        TransferStatus.SUCCESS
+      );
     }
-
-    // publicar na dlt
   }
 
 }

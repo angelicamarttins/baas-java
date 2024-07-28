@@ -21,7 +21,7 @@ public class BacenClient {
   private final HttpClientUtils httpClientUtils;
 
   @TimeLimiter(name = "externalService")
-  @CircuitBreaker(name = "externalService")
+  @CircuitBreaker(name = "bacen")
   @Retry(name = "externalService")
   public CompletableFuture<TransferDataDto.Response> notifyBacenSuccessfulTransfer(String transferData) {
     return CompletableFuture.supplyAsync(() -> {

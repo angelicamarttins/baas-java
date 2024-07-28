@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public interface TransferStrategy {
 
-  AccountsVo verifyAccounts(UUID sourceAccountId, UUID targetAccountId);
+  AccountsVo verifyAccounts(UUID transferId, UUID sourceAccountId, UUID targetAccountId);
 
-  void verifyBalance(AccountDto.Response sourceAccount, BigDecimal value);
+  void verifyBalance(UUID transferId, AccountDto.Response sourceAccount, BigDecimal value);
 
   void notifyBalanceService(Transfer transfer);
 

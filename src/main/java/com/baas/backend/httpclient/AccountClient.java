@@ -23,7 +23,7 @@ public class AccountClient {
   private final HttpClientUtils httpClientUtils;
 
   @TimeLimiter(name = "externalService")
-  @CircuitBreaker(name = "externalService")
+  @CircuitBreaker(name = "accounts")
   @Retry(name = "externalService")
   public CompletableFuture<AccountDto.Response> getAccount(UUID accountId) {
     return CompletableFuture.supplyAsync(
@@ -45,7 +45,7 @@ public class AccountClient {
   }
 
   @TimeLimiter(name = "externalService")
-  @CircuitBreaker(name = "externalService")
+  @CircuitBreaker(name = "accounts")
   @Retry(name = "externalService")
   public CompletableFuture<TransferDataDto.Response> updateAccountBalance(String transferData) {
     return CompletableFuture.supplyAsync(() -> {

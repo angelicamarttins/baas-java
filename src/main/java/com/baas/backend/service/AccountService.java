@@ -7,6 +7,8 @@ import com.baas.backend.exception.AccountNotFoundException;
 import com.baas.backend.exception.UnavailableExternalServiceException;
 import com.baas.backend.httpclient.AccountClient;
 import com.baas.backend.model.Transfer;
+import com.baas.backend.model.TransferStatus;
+import com.baas.backend.repository.TransferRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AccountService {
 
+  private final TransferRepository transferRepository;
   private final AccountClient accountClient;
   private final ObjectMapper objectMapper;
 
@@ -49,7 +52,7 @@ public class AccountService {
       .exceptionally(exception -> {
         String message = "External service for update balance is unavailable";
         log.error(message);
-
+        transferRepository.updateTransferStatus(transfer.getTransferId(), TransferStatus.FAILURE);
         throw new UnavailableExternalServiceException(message, HttpStatus.SERVICE_UNAVAILABLE, exception);
       })
       .get();

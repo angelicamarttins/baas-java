@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "ReprocessedTransfer",
+  "namespace": "com.baas.backend.event.dto",
+  "doc": "Schema for representing Transfer to be reprocessed",
+  "fields": [
+    {
+      "name": "transferId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    }
+  ]
+}

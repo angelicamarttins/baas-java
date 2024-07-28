@@ -18,7 +18,7 @@ public class RegisterClient {
   private final HttpClientUtils httpClientUtils;
 
   @TimeLimiter(name = "externalService")
-  @CircuitBreaker(name = "externalService")
+  @CircuitBreaker(name = "register")
   @Retry(name = "externalService")
   public CompletableFuture<CustomerDto.Response> getCustomer(UUID customerId) {
     return CompletableFuture.supplyAsync(

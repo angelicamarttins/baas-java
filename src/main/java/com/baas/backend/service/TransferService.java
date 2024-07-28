@@ -11,7 +11,6 @@ import com.baas.backend.service.strategy.contract.TransferStrategy;
 import com.baas.backend.validator.TransferValidator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -36,17 +35,15 @@ public class TransferService {
     this.strategies = strategyValidator.getStrategies();
   }
 
-  public TransferDto.Response processTransfer(TransferDto.Request transferRequest)
-    throws ExecutionException, InterruptedException {
+  public TransferDto.Response processTransfer(TransferDto.Request transferRequest) {
     log.info(
       "Starting transfer between accounts. CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
       transferRequest.targetId(),
       transferRequest.transferAccounts().sourceAccountId(),
       transferRequest.transferAccounts().targetAccountId()
     );
-
+    Transfer transfer = saveTransfer(transferRequest);
     CustomerDto.Response targetCustomer = transferValidator.verifyCustomerRegister(transferRequest.targetId());
-
     TransferStrategy transferStrategy = strategies.get(targetCustomer.accountType().name());
 
     if (Objects.isNull(transferStrategy)) {
@@ -55,14 +52,14 @@ public class TransferService {
     }
 
     AccountsVo accounts = transferStrategy.verifyAccounts(
+      transfer.getTransferId(),
       transferRequest.transferAccounts().sourceAccountId(),
       transferRequest.transferAccounts().targetAccountId()
     );
 
-    transferStrategy.verifyBalance(accounts.sourceAccount(), transferRequest.value());
-    Transfer transfer = saveTransfer(transferRequest);
+    transferStrategy.verifyBalance(transfer.getTransferId(), accounts.sourceAccount(), transferRequest.value());
     transferStrategy.notifyBalanceService(transfer);
-    bacenService.notifyBacenService(transfer);
+    bacenService.notifyBacenService(transfer, true);
 
     log.info(
       "Transfer occurred successfully. TransferId: {}, CustomerId: {}, SourceAccountId: {}, TargetAccountId: {}",
