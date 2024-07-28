@@ -1,8 +1,11 @@
 package com.baas.backend.validator;
 
 import com.baas.backend.data.dto.CustomerDto;
+import com.baas.backend.model.Transfer;
+import com.baas.backend.service.RedisService;
 import com.baas.backend.service.RegisterService;
-import java.util.UUID;
+import java.time.Duration;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,12 +15,22 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class TransferValidator {
 
+  private final RedisService redisService;
   private final RegisterService registerService;
 
-  public CustomerDto.Response verifyCustomerRegister(UUID customerId) {
-    log.info("Searching customer. CustomerId: {}", customerId);
+  public CustomerDto.Response verifyTargetRegister(Transfer transfer) {
+    log.info("Searching customer. TargetId: {}", transfer.getTargetId());
 
-    return registerService.findCustomer(customerId);
+    CustomerDto.Response cachedCustomer = (CustomerDto.Response) redisService.get(transfer.getTargetId().toString());
+
+    if (Objects.isNull(cachedCustomer)) {
+      CustomerDto.Response customer = registerService.findCustomer(transfer.getTargetId());
+      redisService.set(transfer.getTargetId().toString(), customer, Duration.ofMinutes(30));
+
+      return customer;
+    }
+
+    return cachedCustomer;
   }
 
 }

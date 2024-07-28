@@ -43,7 +43,8 @@ public class TransferService {
       transferRequest.transferAccounts().targetAccountId()
     );
     Transfer transfer = saveTransfer(transferRequest);
-    CustomerDto.Response targetCustomer = transferValidator.verifyCustomerRegister(transferRequest.targetId());
+
+    CustomerDto.Response targetCustomer = transferValidator.verifyTargetRegister(transfer);
     TransferStrategy transferStrategy = strategies.get(targetCustomer.accountType().name());
 
     if (Objects.isNull(transferStrategy)) {

@@ -3,6 +3,7 @@ package com.baas.backend.service;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import java.time.Duration;
 
 @Service
 @AllArgsConstructor
@@ -10,8 +11,8 @@ public class RedisService {
 
   private final RedisTemplate<String, Object> redisTemplate;
 
-  public void set(String key, Object value) {
-    redisTemplate.opsForValue().set(key, value);
+  public void set(String key, Object value, Duration duration) {
+    redisTemplate.opsForValue().set(key, value, duration);
   }
 
   public Object get(String key) {
