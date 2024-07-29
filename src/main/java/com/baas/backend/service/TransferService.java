@@ -3,6 +3,7 @@ package com.baas.backend.service;
 import com.baas.backend.data.dto.CustomerDto;
 import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.data.vo.AccountsVo;
+import com.baas.backend.event.producer.NotifyTransferProducer;
 import com.baas.backend.model.Transfer;
 import com.baas.backend.model.builder.TransferBuilder;
 import com.baas.backend.repository.TransferRepository;
@@ -19,17 +20,20 @@ import org.springframework.stereotype.Service;
 public class TransferService {
 
   private final BacenService bacenService;
+  private final NotifyTransferProducer notifyTransferProducer;
   private final TransferRepository transferRepository;
   private final TransferValidator transferValidator;
   private final Map<String, TransferStrategy> strategies;
 
   public TransferService(
     BacenService bacenService,
+    NotifyTransferProducer notifyTransferProducer,
     TransferRepository transferRepository,
     TransferValidator transferValidator,
     StrategyValidator strategyValidator
   ) {
     this.bacenService = bacenService;
+    this.notifyTransferProducer = notifyTransferProducer;
     this.transferRepository = transferRepository;
     this.transferValidator = transferValidator;
     this.strategies = strategyValidator.getStrategies();
@@ -61,6 +65,7 @@ public class TransferService {
     transferStrategy.verifyBalance(transfer.getTransferId(), accounts.sourceAccount(), transferRequest.value());
     transferStrategy.notifyBalanceService(transfer);
     bacenService.notifyBacenService(transfer, true);
+    notifyTransferProducer.publish(transfer);
 
     log.info(
       "Transfer occurred successfully. TransferId: {}, TargetId: {}, SourceAccountId: {}, TargetAccountId: {}",

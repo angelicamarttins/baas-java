@@ -1,7 +1,6 @@
 package com.baas.backend.event.producer;
 
 import com.baas.backend.config.properties.KafkaProperties;
-import com.baas.backend.event.dto.ReprocessedTransfer;
 import com.baas.backend.model.Transfer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +10,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class ReprocessBacenProducer {
+public class NotifyTransferProducer {
 
   private final KafkaProperties kafkaProperties;
-  private final KafkaTemplate<String, ReprocessedTransfer> kafkaTemplate;
+  private final KafkaTemplate<String, String> kafkaTemplate;
 
   public void publish(Transfer transfer) {
     log.info(
@@ -23,9 +22,9 @@ public class ReprocessBacenProducer {
     );
 
     kafkaTemplate.send(
-      kafkaProperties.getReprocessBacenTopic(),
+      kafkaProperties.getNotifyTransfer(),
       transfer.getTransferId().toString(),
-      new ReprocessedTransfer(transfer.getTransferId())
+      transfer.getTransferId().toString()
     );
   }
 
