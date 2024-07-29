@@ -27,7 +27,7 @@ public class TransferDto {
   ) {
   }
 
-  public record Response(UUID transferId) {
+  public record Response(@JsonProperty("id_transferencia") UUID transferId) {
   }
 
   public record TransferAccounts(
