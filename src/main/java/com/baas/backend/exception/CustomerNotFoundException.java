@@ -7,6 +7,6 @@ import org.springframework.http.HttpStatus;
 
 public class CustomerNotFoundException extends GeneralHttpException {
   public CustomerNotFoundException(UUID customerId) {
-    super(new ErrorData("Customer not found. CustomerId: " + customerId, HttpStatus.NOT_FOUND));
+    super(new ErrorData("Client não encontrado. idClient: " + customerId, HttpStatus.NOT_FOUND));
   }
 }

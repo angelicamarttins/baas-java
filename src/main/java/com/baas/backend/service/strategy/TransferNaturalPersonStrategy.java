@@ -40,7 +40,7 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
     if (!sourceAccount.activeAccount() || !targetAccount.activeAccount()) {
       transferRepository.updateTransferStatus(transferId, TransferStatus.FAILURE);
 
-      throw new InactiveAccountException("The source or target account is inactive");
+      throw new InactiveAccountException("A conta de origem ou destino está inativa");
     }
 
     return new AccountsVo(sourceAccount, targetAccount);

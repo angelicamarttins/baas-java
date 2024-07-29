@@ -7,6 +7,6 @@ import org.springframework.http.HttpStatus;
 
 public class AccountNotFoundException extends GeneralHttpException {
   public AccountNotFoundException(UUID accountId) {
-    super(new ErrorData("Account not found. AccountId: " + accountId, HttpStatus.NOT_FOUND));
+    super(new ErrorData("Conta não encontrada. Id: " + accountId, HttpStatus.NOT_FOUND));
   }
 }

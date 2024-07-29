@@ -52,11 +52,14 @@ public class AccountService {
 
     accountClient.updateAccountBalance(transferBody)
       .exceptionally(exception -> {
-        String message = "External service for update balance is unavailable";
-        log.error(message);
+        log.error("External service for update balance is unavailable");
         transferRepository.updateTransferStatus(transfer.getTransferId(), TransferStatus.FAILURE);
 
-        throw new UnavailableExternalServiceException(message, HttpStatus.SERVICE_UNAVAILABLE, exception);
+        throw new UnavailableExternalServiceException(
+          "Serviço externo de atualização do saldo está indisponível",
+          HttpStatus.SERVICE_UNAVAILABLE,
+          exception
+        );
       })
       .get();
 
