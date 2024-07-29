@@ -2,7 +2,6 @@ package com.baas.backend.controller;
 
 import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.service.TransferService;
-import java.util.concurrent.ExecutionException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,14 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/transfer")
+@RequestMapping("/transferencia")
 public class TransferController {
 
   private final TransferService transferService;
 
   @PostMapping
-  public ResponseEntity<TransferDto.Response> transfer(@RequestBody TransferDto.Request transferRequest)
-      throws ExecutionException, InterruptedException {
+  public ResponseEntity<TransferDto.Response> saveTransfer(@RequestBody TransferDto.Request transferRequest) {
     return ResponseEntity.ok(transferService.processTransfer(transferRequest));
   }
 

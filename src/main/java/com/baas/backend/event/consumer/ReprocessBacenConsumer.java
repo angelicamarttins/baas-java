@@ -40,9 +40,9 @@ public class ReprocessBacenConsumer {
       record.value(), record.topic(), record.key()
     );
 
+    Transfer transfer = getTransfer(record.value().getTransferId());
+
     try {
-
-
       bacenService.notifyBacenService(transfer, false);
     } catch (Exception exception) {
       log.error(
