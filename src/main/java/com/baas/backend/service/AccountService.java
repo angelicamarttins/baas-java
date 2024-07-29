@@ -10,6 +10,7 @@ import com.baas.backend.model.Transfer;
 import com.baas.backend.model.TransferStatus;
 import com.baas.backend.repository.TransferRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,10 +28,11 @@ public class AccountService {
   private final ObjectMapper objectMapper;
 
   @SneakyThrows
-  public AccountDto.Response findAccount(UUID accountId) {
+  public AccountDto.Response findAccount(UUID transferId, UUID accountId) {
     return accountClient.getAccount(accountId)
       .exceptionally(exception -> {
         log.error("Account not found. AccountId: {}", accountId);
+        transferRepository.updateTransferStatus(transferId, TransferStatus.FAILURE);
 
         throw new AccountNotFoundException(accountId);
       })
@@ -53,10 +55,12 @@ public class AccountService {
         String message = "External service for update balance is unavailable";
         log.error(message);
         transferRepository.updateTransferStatus(transfer.getTransferId(), TransferStatus.FAILURE);
+
         throw new UnavailableExternalServiceException(message, HttpStatus.SERVICE_UNAVAILABLE, exception);
       })
       .get();
 
+    transferRepository.updateTransferAfterBalance(transfer.getTransferId(), LocalDateTime.now());
   }
 
 }

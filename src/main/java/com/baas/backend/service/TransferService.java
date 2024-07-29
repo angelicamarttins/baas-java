@@ -9,7 +9,7 @@ import com.baas.backend.model.builder.TransferBuilder;
 import com.baas.backend.repository.TransferRepository;
 import com.baas.backend.service.strategy.contract.StrategyValidator;
 import com.baas.backend.service.strategy.contract.TransferStrategy;
-import com.baas.backend.validator.TransferValidator;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -21,21 +21,24 @@ public class TransferService {
 
   private final BacenService bacenService;
   private final NotifyTransferProducer notifyTransferProducer;
+  private final RedisService redisService;
+  private final RegisterService registerService;
   private final TransferRepository transferRepository;
-  private final TransferValidator transferValidator;
   private final Map<String, TransferStrategy> strategies;
 
   public TransferService(
     BacenService bacenService,
     NotifyTransferProducer notifyTransferProducer,
+    RedisService redisService,
+    RegisterService registerService,
     TransferRepository transferRepository,
-    TransferValidator transferValidator,
     StrategyValidator strategyValidator
   ) {
     this.bacenService = bacenService;
     this.notifyTransferProducer = notifyTransferProducer;
+    this.redisService = redisService;
+    this.registerService = registerService;
     this.transferRepository = transferRepository;
-    this.transferValidator = transferValidator;
     this.strategies = strategyValidator.getStrategies();
   }
 
@@ -48,7 +51,7 @@ public class TransferService {
     );
     Transfer transfer = saveTransfer(transferRequest);
 
-    CustomerDto.Response targetCustomer = transferValidator.verifyTargetRegister(transfer);
+    CustomerDto.Response targetCustomer = verifyTargetRegister(transfer);
     TransferStrategy transferStrategy = strategies.get(targetCustomer.accountType().name());
 
     if (Objects.isNull(transferStrategy)) {
@@ -89,6 +92,27 @@ public class TransferService {
     transferRepository.save(transfer);
 
     return transfer;
+  }
+
+  private CustomerDto.Response verifyTargetRegister(Transfer transfer) {
+    log.info(
+      "Searching customer. TransferId: {}, TargetId: {}, SourceAccountId: {}, TargetAccountId: {}",
+      transfer.getTargetId(),
+      transfer.getTargetId(),
+      transfer.getSourceAccountId(),
+      transfer.getTargetAccountId()
+    );
+
+    CustomerDto.Response cachedCustomer = (CustomerDto.Response) redisService.get(transfer.getTargetId().toString());
+
+    if (Objects.isNull(cachedCustomer)) {
+      CustomerDto.Response customer = registerService.findCustomer(transfer.getTargetId());
+      redisService.set(transfer.getTargetId().toString(), customer, Duration.ofMinutes(30));
+
+      return customer;
+    }
+
+    return cachedCustomer;
   }
 
 }

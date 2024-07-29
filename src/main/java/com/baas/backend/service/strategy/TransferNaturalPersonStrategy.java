@@ -12,12 +12,10 @@ import com.baas.backend.service.AccountService;
 import com.baas.backend.service.strategy.contract.StrategyType;
 import com.baas.backend.service.strategy.contract.TransferStrategy;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -36,8 +34,8 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
       targetAccountId
     );
 
-    AccountDto.Response sourceAccount = accountService.findAccount(sourceAccountId);
-    AccountDto.Response targetAccount = accountService.findAccount(targetAccountId);
+    AccountDto.Response sourceAccount = accountService.findAccount(transferId, sourceAccountId);
+    AccountDto.Response targetAccount = accountService.findAccount(transferId, targetAccountId);
 
     if (!sourceAccount.activeAccount() || !targetAccount.activeAccount()) {
       transferRepository.updateTransferStatus(transferId, TransferStatus.FAILURE);
@@ -70,7 +68,6 @@ public class TransferNaturalPersonStrategy implements TransferStrategy {
     );
 
     accountService.updateAccountBalance(transfer);
-    transferRepository.updateTransferAfterBalance(transfer.getTransferId(), LocalDateTime.now());
   }
 
 }
