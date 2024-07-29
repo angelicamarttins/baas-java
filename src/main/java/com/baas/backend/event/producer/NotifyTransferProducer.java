@@ -17,7 +17,7 @@ public class NotifyTransferProducer {
 
   public void publish(Transfer transfer) {
     log.info(
-      "Sending Transfer event to be reprocessed - Message: {} - Topic: {} - Key: {}",
+      "Sending Transfer event to notify customers - Message: {} - Topic: {} - Key: {}",
       transfer, kafkaProperties.getReprocessBacenTopic(), transfer.getTransferId()
     );
 
