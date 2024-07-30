@@ -28,9 +28,9 @@ Para utilizar o projeto, realize os passos a seguir:
 1. Clone o repositório que mocka os serviços terceiros e siga as orientações presentes no README do projeto;
 2. Clone o presente repositório seguindo os comandos:
 ```bash
-  git clone bla bla
+  git clone https://github.com/angelicamarttins/baas-java.git
 
-  cd blabla
+  cd baas-java
 ```
 3. Depois de clonar este repositório, certifique-se de que está configurado e em uso na sua máquina a versão 21 do Java e rode o projeto com os seguintes comandos:
 ```bash
