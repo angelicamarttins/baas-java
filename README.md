@@ -25,7 +25,7 @@ notifico o Bacen da transferência realizada.
 
 Para utilizar o projeto, realize os passos a seguir:
 
-1. Clone o repositório que mocka os serviços terceiros e siga as orientações presentes no README do projeto;
+1. [Clone o repositório](https://github.com/mllcarvalho/DesafioItau) que mocka os serviços terceiros e siga as orientações presentes no README do projeto;
 2. Clone o presente repositório seguindo os comandos:
 ```bash
   git clone https://github.com/angelicamarttins/baas-java.git
