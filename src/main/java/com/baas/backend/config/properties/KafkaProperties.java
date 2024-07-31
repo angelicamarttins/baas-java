@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class KafkaProperties {
-  @Value("${spring.kafka.topics.notify-transfer.name}")
-  private String notifyTransfer;
-
   @Value("${spring.kafka.topics.reprocess-bacen.name}")
   private String reprocessBacenTopic;
 }

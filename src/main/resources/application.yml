@@ -40,9 +40,6 @@ spring:
       reprocess-bacen:
         name: reprocess-bacen
         group: reprocess-bacen-service
-      notify-transfer:
-        name: notify-transfer
-        group: notify-transfer-service
 external-services:
   url: http://localhost:9090
 resilience4j:
