@@ -6,5 +6,4 @@
 
 <suppressions>
     <suppress files="ReprocessedTransfer\.java" checks=".*"/>
-    <suppress files="TransferStatus\.java" checks=".*"/>
 </suppressions>
