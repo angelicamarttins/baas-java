@@ -2,17 +2,14 @@ package com.baas.backend.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.baas.backend.data.dto.CustomerDto;
 import com.baas.backend.data.dto.TransferDto;
 import com.baas.backend.data.vo.AccountsVo;
-import com.baas.backend.event.producer.NotifyTransferProducer;
 import com.baas.backend.exception.AccountNotFoundException;
 import com.baas.backend.exception.CustomerNotFoundException;
 import com.baas.backend.exception.InsufficientBalanceException;
@@ -44,9 +41,6 @@ public class TransferServiceUnitTest {
   private BacenService bacenService;
 
   @Mock
-  private NotifyTransferProducer notifyTransferProducer;
-
-  @Mock
   private RedisService redisService;
 
   @Mock
@@ -61,7 +55,6 @@ public class TransferServiceUnitTest {
   private void initializeNotificationProcessorService() {
     transferService = new TransferService(
       bacenService,
-      notifyTransferProducer,
       redisService,
       registerService,
       transferRepository,
@@ -272,7 +265,6 @@ public class TransferServiceUnitTest {
 
     TransferDto.Response response = transferService.processTransfer(transferRequest);
 
-    verify(notifyTransferProducer, atLeastOnce()).publish(any());
     Assertions.assertNotNull(response.transferId());
   }
 }
