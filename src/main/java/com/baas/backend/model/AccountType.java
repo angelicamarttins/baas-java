@@ -13,11 +13,6 @@ public enum AccountType {
     this.value = value;
   }
 
-  @JsonValue
-  public String getValue() {
-    return value;
-  }
-
   @JsonCreator
   public static AccountType fromValue(String value) {
     for (AccountType type : AccountType.values()) {
@@ -26,5 +21,10 @@ public enum AccountType {
       }
     }
     throw new IllegalArgumentException("Unknown value: " + value);
+  }
+
+  @JsonValue
+  public String getValue() {
+    return value;
   }
 }
