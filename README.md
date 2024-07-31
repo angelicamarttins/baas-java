@@ -92,3 +92,7 @@ por uma resposta.
 ### Cache
 Adotei o uso de cache para acelerar determinadas consultas a dados que foram obtidos e, caso nossa aplicação caia
 e o cliente realize uma transferência em sequência, a aplicação não demorará a responder, pois os dados sobre o cliente recebedor e a transferência criada - quando houver falha no Bacen - estarão disponíveis por 30 minutos no Redis.
+
+### Testes
+Normalmente, eu teria testado todas as classes existentes no projeto. Por disponibilidade de tempo, decidi fazer
+testes unitários nas principais classes do sistema: `TransferService` e `TransferNaturalPersonStrategy` a fim de garantir o principal fluxo.
